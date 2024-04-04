@@ -1,0 +1,26 @@
+[package]
+name = "wait-on"
+version = "0.0.0"
+edition = "2021"
+description = "Library and CLI Utility to wait on the availability of resources such as Files, HTTP Servers, Ports & Sockets"
+categories = ["web-programming", "network-programming"]
+homepage = "https://github.com/EstebanBorai/wait-on"
+repository = "https://github.com/EstebanBorai/wait-on"
+readme = "README.md"
+keywords = ["wait", "wait-on", "file", "http", "socket"]
+license = "MIT OR Apache-2.0"
+authors = ["Esteban Borai <estebanborai@gmail.com>"]
+
+[lib]
+name = "wait_on"
+path = "src/lib.rs"
+
+[[bin]]
+name = "wait-on"
+path = "src/bin/main.rs"
+
+[dependencies]
+anyhow = "1.0.81"
+clap = { version = "4.5.4", features = ["std", "derive", "env"] }
+tokio = { version = "1.37.0", features = ["rt-multi-thread", "macros"] }
+notify = "6.1.1"
