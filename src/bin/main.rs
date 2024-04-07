@@ -16,7 +16,7 @@ use self::command::socket::SocketOpt;
 pub enum Command {
     /// Wait on a file to be available
     File(FileOpt),
-    /// Wait on a socket to be available
+    /// Wait on a socket to be available using the TCP Protocol
     Socket(SocketOpt),
 }
 

@@ -29,6 +29,12 @@ cargo install wait-on
 wait-on file /path/to/file
 ```
 
+### Wait for a Socket to be available using TCP Protocol
+
+```bash
+wait-on socket -i 127.0.0.1 -p 8080
+```
+
 ## License
 
 This project is licensed under the MIT license and the Apache License 2.0.
