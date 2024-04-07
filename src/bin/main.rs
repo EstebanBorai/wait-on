@@ -4,6 +4,7 @@ use anyhow::Result;
 use clap::Parser;
 
 use self::command::file::FileOpt;
+use self::command::socket::SocketOpt;
 
 #[derive(Debug, Parser)]
 #[command(
@@ -13,7 +14,10 @@ use self::command::file::FileOpt;
     next_line_help = true
 )]
 pub enum Command {
+    /// Wait on a file to be available
     File(FileOpt),
+    /// Wait on a socket to be available
+    Socket(SocketOpt),
 }
 
 #[derive(Debug, Parser)]
@@ -28,5 +32,6 @@ async fn main() -> Result<()> {
 
     match args.command {
         Command::File(opt) => opt.exec().await,
+        Command::Socket(opt) => opt.exec().await,
     }
 }
