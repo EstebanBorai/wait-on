@@ -2,25 +2,25 @@
 //! own configuration based on the protocols used.
 
 pub mod file;
-pub mod socket;
+pub mod tcp;
 
 use anyhow::Result;
 
 use crate::{WaitOptions, Waitable};
 
 use self::file::FileWaiter;
-use self::socket::SocketWaiter;
+use self::tcp::TcpWaiter;
 
 pub enum Resource {
     File(FileWaiter),
-    Socket(SocketWaiter),
+    Tcp(TcpWaiter),
 }
 
 impl Waitable for Resource {
     async fn wait(self, options: WaitOptions) -> Result<()> {
         match self {
             Resource::File(file) => file.wait(options).await,
-            Resource::Socket(socket) => socket.wait(options).await,
+            Resource::Tcp(tcp) => tcp.wait(options).await,
         }
     }
 }

@@ -10,18 +10,46 @@ use tokio::net::{TcpListener, TcpStream};
 use crate::{WaitOptions, Waitable};
 
 /// Listens on a specific IP Address and Port using TCP protocol
-pub struct SocketWaiter {
+pub struct TcpWaiter {
     pub addr: IpAddr,
     pub port: u16,
 }
 
-impl SocketWaiter {
+impl TcpWaiter {
     pub fn new(addr: IpAddr, port: u16) -> Self {
         Self { addr, port }
     }
 
     pub fn socket(&self) -> SocketAddr {
         SocketAddr::new(self.addr, self.port)
+    }
+}
+
+impl Waitable for TcpWaiter {
+    async fn wait(self, _: WaitOptions) -> Result<()> {
+        let tcp_listener = TcpListener::bind(self.socket()).await?;
+        let (socket, _) = tcp_listener.accept().await?;
+        let mut socket = PacketExtractor::<8>::read(socket).await?;
+
+        tokio::spawn(async move {
+            let mut buf = vec![0; 1024];
+
+            loop {
+                let n = socket
+                    .read(&mut buf)
+                    .await
+                    .expect("failed to read data from socket");
+
+                if n == 0 {
+                    // socket closed
+                    return;
+                }
+            }
+        })
+        .await
+        .map_err(|err| Error::msg(err.to_string()))?;
+
+        Ok(())
     }
 }
 
@@ -95,33 +123,5 @@ impl<const B: usize> AsyncWrite for PacketExtractor<B> {
     ) -> Poll<Result<(), std::io::Error>> {
         let extractor = self.project();
         extractor.socket.poll_shutdown(cx)
-    }
-}
-
-impl Waitable for SocketWaiter {
-    async fn wait(self, _: WaitOptions) -> Result<()> {
-        let tcp_listener = TcpListener::bind(self.socket()).await?;
-        let (socket, _) = tcp_listener.accept().await?;
-        let mut socket = PacketExtractor::<8>::read(socket).await?;
-
-        tokio::spawn(async move {
-            let mut buf = vec![0; 1024];
-
-            loop {
-                let n = socket
-                    .read(&mut buf)
-                    .await
-                    .expect("failed to read data from socket");
-
-                if n == 0 {
-                    // socket closed
-                    return;
-                }
-            }
-        })
-        .await
-        .map_err(|err| Error::msg(err.to_string()))?;
-
-        Ok(())
     }
 }
