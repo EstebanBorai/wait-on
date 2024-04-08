@@ -32,7 +32,7 @@ wait-on file /path/to/file
 ### Wait for a Socket to be available using TCP Protocol
 
 ```bash
-wait-on socket -i 127.0.0.1 -p 8080
+wait-on tcp -i 127.0.0.1 -p 8080
 ```
 
 ## License

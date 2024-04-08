@@ -16,6 +16,24 @@ impl FileWaiter {
     }
 }
 
+impl Waitable for FileWaiter {
+    async fn wait(self, _: WaitOptions) -> Result<()> {
+        let (file_exists_handler, rx) = FileExistsHandler::new();
+        let mut watcher = notify::recommended_watcher(file_exists_handler).unwrap();
+        let parent = self.path.parent().unwrap();
+
+        watcher
+            .watch(parent, notify::RecursiveMode::NonRecursive)
+            .unwrap();
+
+        if rx.recv().is_ok() {
+            watcher.unwatch(parent).unwrap();
+        }
+
+        Ok(())
+    }
+}
+
 struct FileExistsHandler {
     tx: Sender<()>,
 }
@@ -35,23 +53,5 @@ impl EventHandler for FileExistsHandler {
                 self.tx.send(()).unwrap();
             }
         }
-    }
-}
-
-impl Waitable for FileWaiter {
-    async fn wait(self, _: WaitOptions) -> Result<()> {
-        let (file_exists_handler, rx) = FileExistsHandler::new();
-        let mut watcher = notify::recommended_watcher(file_exists_handler).unwrap();
-        let parent = self.path.parent().unwrap();
-
-        watcher
-            .watch(parent, notify::RecursiveMode::NonRecursive)
-            .unwrap();
-
-        if rx.recv().is_ok() {
-            watcher.unwatch(parent).unwrap();
-        }
-
-        Ok(())
     }
 }
