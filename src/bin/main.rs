@@ -2,6 +2,7 @@ mod command;
 
 use anyhow::Result;
 use clap::Parser;
+use command::http::HttpOpt;
 
 use self::command::file::FileOpt;
 use self::command::tcp::TcpOpt;
@@ -16,6 +17,8 @@ use self::command::tcp::TcpOpt;
 pub enum Command {
     /// Wait on a file to be available
     File(FileOpt),
+    /// Wait on a HTTP resource to be available
+    Http(HttpOpt),
     /// Wait on a TCP connection to be available
     Tcp(TcpOpt),
 }
@@ -32,6 +35,7 @@ async fn main() -> Result<()> {
 
     match args.command {
         Command::File(opt) => opt.exec().await,
+        Command::Http(opt) => opt.exec().await,
         Command::Tcp(opt) => opt.exec().await,
     }
 }
