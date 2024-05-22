@@ -29,6 +29,12 @@ cargo install wait-on
 wait-on file /path/to/file
 ```
 
+### Wait for a HTTP Resource to respond
+
+```bash
+wait-on http GET https://example.com
+```
+
 ### Wait for a Socket to be available using TCP Protocol
 
 ```bash
