@@ -26,9 +26,8 @@ impl Waitable for HttpWaiter {
                         println!("Got {}", res.status());
                         break;
                     }
-                    Err(err) => {
-                        println!("Failed to send HTTP Request. {}", err);
-                        break;
+                    Err(_) => {
+                        continue;
                     }
                 }
             }
