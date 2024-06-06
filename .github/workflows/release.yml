@@ -82,7 +82,7 @@ jobs:
 
   artifacts:
     needs: release
-    name: Upload Artifacts ${{ matrix.os }}
+    name: Upload Artifacts ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
