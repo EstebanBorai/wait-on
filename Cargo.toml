@@ -1,6 +1,6 @@
 [package]
 name = "wait-on"
-version = "0.0.7"
+version = "0.0.8"
 edition = "2021"
 description = "Library and CLI Utility to wait on the availability of resources such as Files, HTTP Servers, Ports & Sockets"
 categories = ["web-programming", "network-programming"]
