@@ -23,6 +23,6 @@ path = "src/bin/main.rs"
 anyhow = "1.0.81"
 clap = { version = "4.5.4", features = ["std", "derive", "env"] }
 pin-project = "1.1.5"
-reqwest = "0.12.4"
+reqwest = { version = "0.12.4", default-features = false }
 tokio = { version = "1.37.0", features = ["io-util", "rt-multi-thread", "macros", "net"] }
 notify = "6.1.1"
