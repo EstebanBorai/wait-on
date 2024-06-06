@@ -1,5 +1,8 @@
+use std::time::Duration;
+
 use anyhow::Result;
 use reqwest::{Client, Method, Request, Url};
+use tokio::time::sleep;
 
 use crate::{WaitOptions, Waitable};
 
@@ -26,7 +29,9 @@ impl Waitable for HttpWaiter {
                         println!("Got {}", res.status());
                         break;
                     }
-                    Err(_) => {
+                    Err(err) => {
+                        println!("Rec {}", err);
+                        sleep(Duration::from_secs(1)).await;
                         continue;
                     }
                 }

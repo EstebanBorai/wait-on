@@ -82,7 +82,7 @@ jobs:
 
   artifacts:
     needs: release
-    name: Upload Artifacts ${{ matrix.os }}
+    name: Upload Artifacts ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -120,6 +120,12 @@ jobs:
 
       - name: Build for Release
         run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Install ${{ matrix.name }} System Dependencies
+        if: matrix.name == 'linux-x64-musl'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y musl-tools
 
       - name: Prepare Binary
         shell: bash
