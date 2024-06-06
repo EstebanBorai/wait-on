@@ -22,12 +22,11 @@ jobs:
     name: "Runs cargo publish --dry-run"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
 
       - name: publish crate
         run: cargo publish --dry-run
@@ -38,14 +37,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Install `cargo-edit`
         run: cargo install cargo-edit
@@ -84,3 +79,47 @@ jobs:
               tag_name: "v${{ env.CRATE_VERSION }}",
               generate_release_notes: true
             });
+
+  artifacts:
+    needs: release
+    name: Upload Artifacts ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    strategy:
+      matrix:
+        name:
+          - linux
+          - macos
+          - windows
+      include:
+        - name: linux
+          os: ubuntu-latest
+          artifact_name: wait-on
+          asset_name: wait-on
+
+        - name: macos
+          os: macos-latest
+          artifact_name: wait-on
+          asset_name: wait-on
+
+        - name: windows
+          os: windows-latest
+          artifact_name: wait-on
+          asset_name: wait-on.exe
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Upload release artifacts
+        uses: actions/github-script@v5
+        env:
+          ARTIFACT_NAME: ${{ matrix.artifact_name }}
+          ASSET_NAME: ${{ matrix.asset_name }}
+        with:
+          script: |
+            const script = require('./.github/workflows/scripts/upload-artifacts.js');
+            console.log(script({ github, context }));
