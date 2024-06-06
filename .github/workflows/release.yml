@@ -89,37 +89,48 @@ jobs:
     strategy:
       matrix:
         name:
-          - linux
-          - macos
-          - windows
-      include:
-        - name: linux
-          os: ubuntu-latest
-          artifact_name: wait-on
-          asset_name: wait-on
+          - linux-x64-musl
+          - macos-x64
+          - macos-aarch64
 
-        - name: macos
-          os: macos-latest
-          artifact_name: wait-on
-          asset_name: wait-on
+        include:
+          - name: linux-x64-musl
+            os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            exe: wait-on
 
-        - name: windows
-          os: windows-latest
-          artifact_name: wait-on
-          asset_name: wait-on.exe
+          - name: macos-x64
+            os: macos-latest
+            target: x86_64-apple-darwin
+            exe: wait-on
+
+          - name: macos-aarch64
+            os: macos-latest
+            target: aarch64-apple-darwin
+            exe: wait-on
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
-
-      - name: Upload release artifacts
-        uses: actions/github-script@v5
-        env:
-          ARTIFACT_NAME: ${{ matrix.artifact_name }}
-          ASSET_NAME: ${{ matrix.asset_name }}
         with:
-          script: |
-            const script = require('./.github/workflows/scripts/upload-artifacts.js');
-            console.log(script({ github, context }));
+          targets: ${{ matrix.target }}
+
+      - name: Build for Release
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Prepare Binary
+        shell: bash
+        run: |
+          chmod +x ./target/${{ matrix.target }}/release/${{ matrix.exe }}
+          cp ./target/${{ matrix.target }}/release/${{ matrix.exe }} ./${{ matrix.exe }}
+
+      - name: Attach Binary
+        uses: svenstaro/upload-release-action@2.9.0
+        with:
+          asset_name: wait-on-${{ matrix.target }}
+          file: ${{ matrix.exe }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref }}
