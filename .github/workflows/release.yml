@@ -133,10 +133,15 @@ jobs:
           chmod +x ./target/${{ matrix.target }}/release/${{ matrix.exe }}
           cp ./target/${{ matrix.target }}/release/${{ matrix.exe }} ./${{ matrix.exe }}
 
+      - name: Set Crate Version as Environment Variable
+        run: |
+          CARGO_TOML_VERSION=$(awk -F ' = ' '$1 ~ /version/ { gsub(/[\"]/, "", $2); printf("%s",$2) }' Cargo.toml)
+          echo "CRATE_VERSION=$CARGO_TOML_VERSION" >> $GITHUB_ENV
+
       - name: Attach Binary
         uses: svenstaro/upload-release-action@2.9.0
         with:
           asset_name: wait-on-${{ matrix.target }}
           file: ${{ matrix.exe }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ github.ref }}
+          tag: "v${{ env.CRATE_VERSION }}"
