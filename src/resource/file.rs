@@ -17,7 +17,7 @@ impl FileWaiter {
 }
 
 impl Waitable for FileWaiter {
-    async fn wait(self, _: WaitOptions) -> Result<()> {
+    async fn wait(&self, _: &WaitOptions) -> Result<()> {
         let (file_exists_handler, rx) = FileExistsHandler::new();
         let mut watcher = notify::recommended_watcher(file_exists_handler).unwrap();
         let parent = self.path.parent().unwrap();

@@ -18,9 +18,9 @@ impl HttpWaiter {
 }
 
 impl Waitable for HttpWaiter {
-    async fn wait(self, _: WaitOptions) -> Result<()> {
+    async fn wait(&self, _: &WaitOptions) -> Result<()> {
         let client = Client::new();
-        let request = Request::new(self.method, self.url);
+        let request = Request::new(self.method.clone(), self.url.clone());
 
         loop {
             if let Some(req) = request.try_clone() {
@@ -29,8 +29,7 @@ impl Waitable for HttpWaiter {
                         println!("Got {}", res.status());
                         break;
                     }
-                    Err(err) => {
-                        println!("Rec {}", err);
+                    Err(_) => {
                         sleep(Duration::from_secs(1)).await;
                         continue;
                     }

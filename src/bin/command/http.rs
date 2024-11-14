@@ -12,8 +12,8 @@ pub struct HttpOpt {
 }
 
 impl HttpOpt {
-    pub async fn exec(&self) -> Result<()> {
+    pub async fn exec(&self, options: &WaitOptions) -> Result<()> {
         let waiter = HttpWaiter::new(self.method.clone(), self.url.clone());
-        waiter.wait(WaitOptions::default()).await
+        waiter.wait(options).await
     }
 }

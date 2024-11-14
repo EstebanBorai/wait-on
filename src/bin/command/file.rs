@@ -12,8 +12,8 @@ pub struct FileOpt {
 }
 
 impl FileOpt {
-    pub async fn exec(&self) -> Result<()> {
+    pub async fn exec(&self, options: &WaitOptions) -> Result<()> {
         let waiter = FileWaiter::new(self.path.clone());
-        waiter.wait(WaitOptions::default()).await
+        waiter.wait(options).await
     }
 }
