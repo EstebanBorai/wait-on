@@ -23,10 +23,10 @@ cargo install wait-on
 
 ## Usage
 
-### Wait for a file to exist
+### Wait for a file to exist or exit with code 1 if 10m elapses waiting
 
 ```bash
-wait-on file /path/to/file
+wait-on -t 10m file /path/to/file
 ```
 
 ### Wait for a HTTP Resource to respond
