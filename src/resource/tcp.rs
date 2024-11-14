@@ -26,7 +26,7 @@ impl TcpWaiter {
 }
 
 impl Waitable for TcpWaiter {
-    async fn wait(self, _: WaitOptions) -> Result<()> {
+    async fn wait(&self, _: &WaitOptions) -> Result<()> {
         let tcp_listener = TcpListener::bind(self.socket()).await?;
         let (socket, _) = tcp_listener.accept().await?;
         let mut socket = PacketExtractor::<8>::read(socket).await?;

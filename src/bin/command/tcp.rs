@@ -15,8 +15,8 @@ pub struct TcpOpt {
 }
 
 impl TcpOpt {
-    pub async fn exec(&self) -> Result<()> {
+    pub async fn exec(&self, options: &WaitOptions) -> Result<()> {
         let waiter = TcpWaiter::new(self.addr, self.port);
-        waiter.wait(WaitOptions::default()).await
+        waiter.wait(options).await
     }
 }

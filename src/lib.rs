@@ -2,16 +2,27 @@
 //! such as Files, HTTP Servers, Ports & Sockets
 
 pub mod resource;
+pub mod task;
+
+use std::time::Duration;
 
 use anyhow::Result;
 
-pub type Millis = u64;
+const SECONDS_IN_HOUR: u64 = 3600;
 
 /// Options available for waiting on a [`Waitable`].
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct WaitOptions {
     /// Timeout in milliseconds for the wait operation.
-    pub timeout: Option<Millis>,
+    pub timeout: Duration,
+}
+
+impl Default for WaitOptions {
+    fn default() -> Self {
+        Self {
+            timeout: Duration::from_secs(SECONDS_IN_HOUR),
+        }
+    }
 }
 
 /// A [`Waitable`] is an resource that can be waited on.
@@ -24,5 +35,5 @@ pub struct WaitOptions {
 /// implemented by the [`Resource`] enum variants in the `lib` scope.
 #[allow(async_fn_in_trait)]
 pub trait Waitable {
-    async fn wait(self, options: WaitOptions) -> Result<()>;
+    async fn wait(&self, options: &WaitOptions) -> Result<()>;
 }

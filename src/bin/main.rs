@@ -3,6 +3,8 @@ mod command;
 use anyhow::Result;
 use clap::Parser;
 use command::http::HttpOpt;
+use humantime::Duration;
+use wait_on::WaitOptions;
 
 use self::command::file::FileOpt;
 use self::command::tcp::TcpOpt;
@@ -25,6 +27,9 @@ pub enum Command {
 
 #[derive(Debug, Parser)]
 pub struct Cli {
+    /// Timeout for waiting tasks
+    #[clap(long, short = 't', default_value = "1h")]
+    pub timeout: Duration,
     #[command(subcommand)]
     pub command: Command,
 }
@@ -32,10 +37,13 @@ pub struct Cli {
 #[tokio::main]
 async fn main() -> Result<()> {
     let args = Cli::parse();
+    let options = WaitOptions {
+        timeout: args.timeout.into(),
+    };
 
     match args.command {
-        Command::File(opt) => opt.exec().await,
-        Command::Http(opt) => opt.exec().await,
-        Command::Tcp(opt) => opt.exec().await,
+        Command::File(opt) => opt.exec(&options).await,
+        Command::Http(opt) => opt.exec(&options).await,
+        Command::Tcp(opt) => opt.exec(&options).await,
     }
 }

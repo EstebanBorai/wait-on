@@ -20,7 +20,7 @@ pub enum Resource {
 }
 
 impl Waitable for Resource {
-    async fn wait(self, options: WaitOptions) -> Result<()> {
+    async fn wait(&self, options: &WaitOptions) -> Result<()> {
         match self {
             Resource::File(file) => file.wait(options).await,
             Resource::Http(http) => http.wait(options).await,
