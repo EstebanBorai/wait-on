@@ -60,7 +60,7 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add .
           git commit -m "chore: bump version to v$CRATE_VERSION"
-          git push origin trunk --follow-tags
+          git push origin main --follow-tags
 
       - name: Login to Crates.io
         run: cargo login ${CRATES_IO_TOKEN}
