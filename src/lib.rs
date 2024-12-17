@@ -11,7 +11,7 @@ use anyhow::Result;
 const SECONDS_IN_HOUR: u64 = 3600;
 
 /// Options available for waiting on a [`Waitable`].
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct WaitOptions {
     /// Timeout in milliseconds for the wait operation.
     pub timeout: Duration,

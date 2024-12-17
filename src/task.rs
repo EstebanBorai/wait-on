@@ -17,9 +17,18 @@ impl WaitOnTask {
 
     pub async fn run(self) -> Result<()> {
         select! {
-            _ = self.resource.wait(&self.options) => Ok(()),
+            _ = self.watch() => Ok(()),
             _ = self.deadline() => bail!("Timeout reached"),
         }
+    }
+
+    async fn watch(&self) -> Result<()> {
+        let resource = self.resource.clone();
+        let options = self.options.clone();
+
+        tokio::spawn(async move { resource.wait(&options).await }).await??;
+
+        Ok(())
     }
 
     async fn deadline(&self) -> Result<()> {

@@ -13,6 +13,7 @@ use self::file::FileWaiter;
 use self::http::HttpWaiter;
 use self::tcp::TcpWaiter;
 
+#[derive(Clone)]
 pub enum Resource {
     File(FileWaiter),
     Http(HttpWaiter),

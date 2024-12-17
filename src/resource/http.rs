@@ -6,6 +6,7 @@ use tokio::time::sleep;
 
 use crate::{WaitOptions, Waitable};
 
+#[derive(Clone)]
 pub struct HttpWaiter {
     pub method: Method,
     pub url: Url,

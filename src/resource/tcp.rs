@@ -8,6 +8,7 @@ use tokio::time::sleep;
 use crate::{WaitOptions, Waitable};
 
 /// Listens on a specific IP Address and Port using TCP protocol
+#[derive(Clone)]
 pub struct TcpWaiter {
     pub addr: IpAddr,
     pub port: u16,
