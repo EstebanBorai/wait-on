@@ -18,7 +18,7 @@ impl WaitOnTask {
     pub async fn run(self) -> Result<()> {
         select! {
             _ = self.resource.wait(&self.options) => Ok(()),
-            _ = self.deadline() => bail!("Deadline reached"),
+            _ = self.deadline() => bail!("Timeout reached"),
         }
     }
 

@@ -1,13 +1,17 @@
-mod command;
+use std::net::IpAddr;
+use std::path::PathBuf;
 
 use anyhow::Result;
 use clap::Parser;
-use command::http::HttpOpt;
 use humantime::Duration;
-use wait_on::WaitOptions;
 
-use self::command::file::FileOpt;
-use self::command::tcp::TcpOpt;
+use reqwest::{Method, Url};
+use wait_on::resource::file::FileWaiter;
+use wait_on::resource::http::HttpWaiter;
+use wait_on::resource::tcp::TcpWaiter;
+use wait_on::resource::Resource;
+use wait_on::task::WaitOnTask;
+use wait_on::WaitOptions;
 
 #[derive(Debug, Parser)]
 #[command(
@@ -18,11 +22,16 @@ use self::command::tcp::TcpOpt;
 )]
 pub enum Command {
     /// Wait on a file to be available
-    File(FileOpt),
+    File { path: PathBuf },
     /// Wait on a HTTP resource to be available
-    Http(HttpOpt),
+    Http { method: Method, url: Url },
     /// Wait on a TCP connection to be available
-    Tcp(TcpOpt),
+    Tcp {
+        #[clap(short = 'p', long = "port")]
+        port: u16,
+        #[clap(short = 'i', long = "ip", default_value = "127.0.0.1")]
+        addr: IpAddr,
+    },
 }
 
 #[derive(Debug, Parser)]
@@ -40,10 +49,12 @@ async fn main() -> Result<()> {
     let options = WaitOptions {
         timeout: args.timeout.into(),
     };
+    let resource: Resource = match args.command {
+        Command::File { path } => Resource::File(FileWaiter::new(path)),
+        Command::Http { method, url } => Resource::Http(HttpWaiter::new(method, url)),
+        Command::Tcp { addr, port } => Resource::Tcp(TcpWaiter::new(addr, port)),
+    };
+    let wait_on_task = WaitOnTask::new(resource, options);
 
-    match args.command {
-        Command::File(opt) => opt.exec(&options).await,
-        Command::Http(opt) => opt.exec(&options).await,
-        Command::Tcp(opt) => opt.exec(&options).await,
-    }
+    wait_on_task.run().await
 }

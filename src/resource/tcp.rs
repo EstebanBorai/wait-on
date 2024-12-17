@@ -27,8 +27,7 @@ impl Waitable for TcpWaiter {
     async fn wait(&self, _: &WaitOptions) -> Result<()> {
         let connect = || async { TcpStream::connect(self.socket()).await };
 
-        while let Err(err) = connect().await {
-            println!("Failed to connect to {}. {err}", self.socket());
+        while (connect().await).is_err() {
             sleep(Duration::from_secs(1)).await;
         }
 
